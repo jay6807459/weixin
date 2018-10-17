@@ -1,6 +1,7 @@
 <?php
 namespace app\weixin\controller;
 
+use app\weixin\helper\Agent;
 use app\weixin\helper\Base;
 use app\weixin\helper\Message;
 use think\facade\Config;
@@ -22,5 +23,29 @@ class Index
         $reply_echostr = Message::decode($echostr);
         //4.在1秒内响应GET请求，响应内容为上一步得到的明文消息内容(不能加引号，不能带bom头，不能带换行符)
         echo $reply_echostr;
+    }
+
+    public function test()
+    {
+        $access_token = Base::getAccessToken(1000002);
+        var_dump($access_token);
+    }
+
+    public function message(){
+        $type = input('get.type');
+        switch ($type){
+            case 'text':
+                $message = new Message(1000002);
+                $result = $message->setTouser('XiongQinLiang')->setMsgtype('text')->send([
+                    'text' => [
+                        'content' => '主动发送文本消息222'
+                    ]
+                ]);
+                var_dump($result);
+                break;
+            default:
+                echo 'message';
+                break;
+        }
     }
 }
