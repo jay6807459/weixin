@@ -13,11 +13,8 @@ use app\weixin\helper\algorithm\crypt;
 use think\Exception;
 use think\facade\Config;
 
-class Message extends Base
+class Message extends Agent
 {
-    //应用凭证
-    protected $access_token;
-
     //消息主题
     protected $content;
 
@@ -38,7 +35,7 @@ class Message extends Base
 
     public function __construct($agent_id)
     {
-        $this->access_token = Base::getAccessToken($agent_id);
+        parent::__construct($agent_id);
         $this->content['agentid'] = $agent_id;
         $this->content['safe'] = $this->safe;
     }
@@ -87,9 +84,9 @@ class Message extends Base
      * 加密字符串解密
      * @param $echostr
      */
-    public static function decode($echostr){
-        $crypt = new crypt(Config::get('encoding_aeskey'));
-        $result = $crypt->decrypt($echostr, Config::get('corpid'));
+    public function decode($echostr){
+        $crypt = new crypt($this->encoding_aeskey);
+        $result = $crypt->decrypt($echostr, $this->corpid);
         if ($result[0] != 0) {
             return $result[0];
         }
