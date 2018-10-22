@@ -13,4 +13,9 @@ class Url
 {
     const GET_TOKEN = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken';
     const SEND_MESSAGE = 'https://qyapi.weixin.qq.com/cgi-bin/message/send';
+    const GET_DEPARTMENT_LIST = 'https://qyapi.weixin.qq.com/cgi-bin/department/list';
+    const UPDATE_DEPARTMENT_INFO = 'https://qyapi.weixin.qq.com/cgi-bin/department/update';
+    const DELETE_DEPARTMENT_INFO = 'https://qyapi.weixin.qq.com/cgi-bin/department/delete';
+    const GET_USER_LIST = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
+    const GET_USER_INFO = 'https://qyapi.weixin.qq.com/cgi-bin/user/get';
 }

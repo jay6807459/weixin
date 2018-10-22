@@ -81,15 +81,15 @@ class Agent
     public function getAccessToken()
     {
         $cache_path = __DIR__ . '/../cache/' . $this->agent_id . '.php';
-        $cache = json_decode(get_file_cache($cache_path));
+        $cache = json_decode(get_file_cache($cache_path), true);
         //缓存文件不存在或者缓存过期
-        if($cache->expires_in == 0 || time() >= filemtime($cache_path) + $cache->expires_in){
-            $cache = json_decode(http_get(Url::GET_TOKEN, [
+        if($cache['expires_in'] == 0 || time() >= filemtime($cache_path) + $cache['expires_in']){
+            $cache = http_get(Url::GET_TOKEN, [
                 'corpid' => $this->corpid,
                 'corpsecret' => $this->secret
-            ]));
+            ]);
             set_file_cache($cache_path, json_encode($cache));
         }
-        return $cache->access_token;
+        return $cache['access_token'];
     }
 }

@@ -76,8 +76,11 @@ class Message extends Agent
             default:
                 break;
         }
-        $content = http_post(append_access_token(Url::SEND_MESSAGE, $this->access_token), $this->content);
-        return $content;
+        $result = http_post(append_access_token(Url::SEND_MESSAGE, $this->access_token), $this->content);
+        if($result['errcode'] != 0){
+            throw new Exception($result['errmsg']);
+        }
+        return $result;
     }
 
     /**

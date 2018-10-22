@@ -3,7 +3,9 @@ namespace app\weixin\controller;
 
 use app\weixin\helper\Agent;
 use app\weixin\helper\Base;
+use app\weixin\helper\Department;
 use app\weixin\helper\Message;
+use app\weixin\helper\User;
 use think\facade\Config;
 class Index
 {
@@ -30,24 +32,71 @@ class Index
      * 消息发送
      */
     public function message(){
-        $type = input('get.type');
-        switch ($type){
+        $op = input('get.op');
+        switch ($op){
             case 'text':
-                try{
-                    $message = new Message(1000002);
-                    $result = $message->setTouser('XiongQinLiang')->setMsgtype('text')->send([
-                        'text' => [
-                            'content' => '主动发送文本消息222'
-                        ]
-                    ]);
-                    var_dump($result);
-
-                }catch(\Exception $e){
-                    echo $e->getFile() . $e->getLine() . $e->getMessage();
-                }
+                $message = new Message(1000002);
+                $result = $message->setTouser('XiongQinLiang')->setMsgtype('text')->send([
+                    'text' => [
+                        'content' => '主动发送文本消息222'
+                    ]
+                ]);
+                p($result);
                 break;
             default:
-                echo 'message';
+                break;
+        }
+    }
+
+    /**
+     * 用户相关
+     */
+    public function user(){
+        $op = input('get.op');
+        switch ($op){
+            case 'list':
+                $user = new User(1000002);
+                $user_list = $user->getList(1);
+                p($user_list);
+                break;
+            case 'info':
+                $user = new User(1000002);
+                $user_info = $user->getInfo('XiongQinLiang');
+                p($user_info);
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 部门相关
+     */
+    public function department(){
+        $op = input('get.op');
+        switch ($op){
+            case 'list':
+                $department = new Department(1000002);
+                $department_list = $department->getList();
+                p($department_list);
+                break;
+            case 'info':
+                $department = new Department(1000002);
+                $department_info = $department->getInfo(1);
+                p($department_info);
+            case 'update':
+                $department = new Department(1000002);
+                $result = $department->update([
+                    'id' => 1,
+                    'name' => '测试',
+                    'parentid' => 0,
+                    'order' => 100
+                ]);
+                p($result);
+            case 'delete':
+                $department = new Department(1000002);
+                $result = $department->delete(1);
+                p($result);
+            default:
                 break;
         }
     }

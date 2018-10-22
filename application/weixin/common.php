@@ -1,16 +1,25 @@
 <?php
+//打印数据
+function p($var, $isdie=TRUE, $type=null){
+    if($type==1) die(var_dump($var));
+    echo '<pre>';
+    print_r($var);
+    echo '</pre>';
+    if($isdie) die;
+}
+
 /**
  * GET 请求
  * @param string $url
  */
-function http_get($url, $param){
-    if(strpos($url, '?') === false){
-        $url .= '?';
+function http_get($url, $param = array()){
+    $url .= (strpos($url, '?') === false) ? '?' : '&';
+    if(!empty($param)){
+        foreach($param as $k => $v){
+            $url .= $k . '=' . $v . '&';
+        }
+        $url = substr($url, 0, -1);
     }
-    foreach($param as $k => $v){
-        $url .= $k . '=' . $v . '&';
-    }
-    $url = substr($url, 0, -1);
     $oCurl = curl_init();
     if(stripos($url,"https://")!==FALSE){
         curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -26,7 +35,7 @@ function http_get($url, $param){
     // $aStatus = curl_getinfo($oCurl);
     $sContent = execCURL($oCurl);
     curl_close($oCurl);
-    return $sContent['content'];
+    return json_decode($sContent['content'], true);
 }
 /**
  * POST 请求
@@ -80,7 +89,7 @@ function http_post($url,$param,$post_file=false){
     $sContent = execCURL($oCurl);
     curl_close($oCurl);
 
-    return $sContent['content'];
+    return json_decode($sContent['content'], true);
 }
 
 /**
