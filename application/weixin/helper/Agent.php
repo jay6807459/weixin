@@ -92,4 +92,15 @@ class Agent
         }
         return $cache['access_token'];
     }
+
+    /**
+     * 获取应用信息
+     */
+    public function getInfo(){
+        $result = http_get(append_access_token(Url::AGENT_GET, $this->access_token), ['agentid' => $this->agent_id]);
+        if($result['errcode'] != 0){
+            throw new Exception($result['errmsg']);
+        }
+        return $result;
+    }
 }

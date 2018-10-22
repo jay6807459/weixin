@@ -29,6 +29,22 @@ class Index
     }
 
     /**
+     * 应用相关
+     */
+    public function agent(){
+        $op = input('get.op');
+        switch ($op){
+            case 'info':
+                $agent = new Agent(1000002);
+                $agent_info = $agent->getInfo();
+                p($agent_info);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * 消息发送
      */
     public function message(){
@@ -83,6 +99,17 @@ class Index
                 $department = new Department(1000002);
                 $department_info = $department->getInfo(1);
                 p($department_info);
+                break;
+            case 'create':
+                $department = new Department(1000002);
+                $result = $department->create([
+                    'id' => 2,
+                    'name' => '部门2',
+                    'parentid' => 0,
+                    'order' => 10000
+                ]);
+                p($result);
+                break;
             case 'update':
                 $department = new Department(1000002);
                 $result = $department->update([
@@ -92,9 +119,10 @@ class Index
                     'order' => 100
                 ]);
                 p($result);
+                break;
             case 'delete':
                 $department = new Department(1000002);
-                $result = $department->delete(1);
+                $result = $department->delete(2);
                 p($result);
             default:
                 break;

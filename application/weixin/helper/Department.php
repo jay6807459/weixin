@@ -48,6 +48,18 @@ class Department extends Agent
     }
 
     /**
+     * 创建部门
+     * @param $data
+     */
+    public function create($data){
+        $result = http_post(append_access_token(Url::CREATE_DEPARTMENT_INFO, $this->access_token), $data);
+        if($result['errcode'] != 0){
+            throw new Exception($result['errmsg']);
+        }
+        return $result;
+    }
+
+    /**
      * 更新部门信息
      * @param $data
      */
