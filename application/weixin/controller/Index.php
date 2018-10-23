@@ -6,11 +6,11 @@ use app\weixin\helper\Base;
 use app\weixin\helper\Department;
 use app\weixin\helper\Message;
 use app\weixin\helper\User;
-use think\facade\Config;
 class Index
 {
     /**
      * 开启消息服务器验证-应用一
+     * @route('weixin/index/agent1', 'get')
      */
     public function agent1()
     {
@@ -20,12 +20,18 @@ class Index
         $nonce = input('get.nonce');
         $echostr = input('get.echostr');
         //2.通过参数msg_signature对请求进行校验，确认调用者的合法性。
-        $message = new Message(1000002);
-        $message->validateSignature($msg_signature, $timestamp, $nonce, $echostr);
         //3.解密echostr参数得到消息内容(即msg字段)
-        $reply_echostr = $message->decode($echostr);
+        $message = new Message(1000002);
+        $reply_echostr = $message->decode($msg_signature, $timestamp, $nonce, $echostr);
         //4.在1秒内响应GET请求，响应内容为上一步得到的明文消息内容(不能加引号，不能带bom头，不能带换行符)
         echo $reply_echostr;
+    }
+
+    /**
+     * @route('weixin/index/agent1', 'post')
+     */
+    public function response(){
+
     }
 
     /**

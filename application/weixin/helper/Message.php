@@ -84,10 +84,74 @@ class Message extends Agent
     }
 
     /**
+     * 被动接收消息
+    接收xml格式：
+    <xml>
+    <ToUserName><![CDATA[toUser]]></ToUserName>
+    <AgentID><![CDATA[toAgentID]]></AgentID>
+    <Encrypt><![CDATA[msg_encrypt]]></Encrypt>
+    </xml>
+    响应xml格式：
+    <xml>
+    <Encrypt><![CDATA[msg_encrypt]]></Encrypt>
+    <MsgSignature><![CDATA[msg_signature]]></MsgSignature>
+    <TimeStamp>timestamp</TimeStamp>
+    <Nonce><![CDATA[nonce]]></Nonce>
+    </xml>
+     */
+    public function receive(){
+        $receive_crypt_xml = file_get_contents('php://input');
+        $crypt = new crypt($this->getEncodingAeskey());
+        $result = $crypt->decrypt($receive_crypt_xml, $this->corpid);
+        if ($result[0] != 0) {
+            return $result[0];
+        }
+        //解密xml明文
+        $receive_decrypt_xml = $result[1];
+        $receive_decrypt_arr = $this->xmlToArray($receive_decrypt_xml);
+
+        //构造被动响应数据
+
+    }
+
+    /**
+     * 被动响应消息
+     */
+    public function response($data, $timestamp, $nonce){
+
+    }
+
+    /**
+     * 字符串加密
+     */
+    public function encode($data, $timestamp, $nonce){
+        $crypt = new crypt($this->getEncodingAeskey());
+        $visible_xml = $this->arrayToXml($data);
+        $result = $crypt->encrypt($visible_xml, $this->corpid);
+        if ($result[0] != 0) {
+            return $result[0];
+        }
+        //加密
+        $encrypt = $result[1];
+        //加密后的明文
+        $signature = $this->createSignature($timestamp, $nonce, $encrypt);
+        $hidden_xml = $this->arrayToXml([
+            'Encrypt' => $encrypt,
+            'MsgSignature' => $signature,
+            'TimeStamp' => $timestamp,
+            'Nonce' => $nonce
+        ]);
+        return $hidden_xml;
+    }
+
+    /**
      * 加密字符串解密
      * @param $echostr
      */
-    public function decode($echostr){
+    public function decode($msg_signature, $timestamp, $nonce, $echostr){
+        //验证签名
+        $this->validateSignature($msg_signature, $timestamp, $nonce, $echostr);
+        //解密
         $crypt = new crypt($this->getEncodingAeskey());
         $result = $crypt->decrypt($echostr, $this->corpid);
         if ($result[0] != 0) {
@@ -95,5 +159,26 @@ class Message extends Agent
         }
         $reply_echostr = $result[1];
         return $reply_echostr;
+    }
+
+    /**
+     * 数组转xml格式
+     * @param $data
+     */
+    public function arrayToXml($data){
+        $xml = '<xml>';
+        foreach($data as $k => $v){
+            $xml .= ($k == 'TimeStamp') ? "<{$k}><![CDATA[{$v}]]></{$k}>" : "<{$k}>{$v}</{$k}>";
+        }
+        $xml .= '</xml>';
+        return $xml;
+    }
+
+    /**
+     * xml转数组格式
+     * @param $data
+     */
+    public function xmlToArray($data){
+
     }
 }
