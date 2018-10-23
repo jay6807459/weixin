@@ -31,7 +31,15 @@ class Index
      * @route('weixin/index/agent1', 'post')
      */
     public function response(){
+        $message = new Message(1000002);
+        $message->receive();
+    }
 
+    /**
+     * @route('weixin/index/test', 'get')
+     */
+    public function test(){
+        echo 'test';
     }
 
     /**
