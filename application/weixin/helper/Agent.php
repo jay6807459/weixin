@@ -20,10 +20,6 @@ class Agent
 
     public $secret;
 
-    public $token;
-
-    public $encoding_aeskey;
-
     public $access_token;
 
     public function __construct($agent_id)
@@ -35,11 +31,18 @@ class Agent
             throw new Exception('应用ID不存在');
         }
         $this->secret = $agents[$agent_id]['secret'];
-        $this->token = $agents[$agent_id]['token'];
-        $this->encoding_aeskey = $agents[$agent_id]['encoding_aeskey'];
         $this->access_token = $this->getAccessToken();
     }
 
+    protected function getToken(){
+        $agents = Config::get('agents');
+        return $agents[$this->agent_id]['token'];
+    }
+
+    protected function getEncodingAeskey(){
+        $agents = Config::get('agents');
+        return $agents[$this->agent_id]['encoding_aeskey'];
+    }
 
     /**
      * 验证签名的合法性
@@ -68,7 +71,7 @@ class Agent
      * @return string
      */
     public function createSignature($timestamp, $nonce, $echostr){
-        $signature_arr = array($this->token, $timestamp, $nonce, $echostr);
+        $signature_arr = array($this->getToken(), $timestamp, $nonce, $echostr);
         sort($signature_arr, SORT_STRING);
         $signature = sha1(implode($signature_arr));
         return $signature;

@@ -88,7 +88,7 @@ class Message extends Agent
      * @param $echostr
      */
     public function decode($echostr){
-        $crypt = new crypt($this->encoding_aeskey);
+        $crypt = new crypt($this->getEncodingAeskey());
         $result = $crypt->decrypt($echostr, $this->corpid);
         if ($result[0] != 0) {
             return $result[0];
