@@ -75,7 +75,7 @@ class Message extends Agent
             default:
                 break;
         }
-        $result = http_post(append_access_token(Url::SEND_MESSAGE, $this->access_token), $this->content);
+        $result = http_post($this->appendAccessToken(Url::MESSAGE_INFO_SEND), $this->content);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }

@@ -87,7 +87,7 @@ class Agent
         $cache = json_decode(get_file_cache($cache_path), true);
         //缓存文件不存在或者缓存过期
         if($cache['expires_in'] == 0 || time() >= filemtime($cache_path) + $cache['expires_in']){
-            $cache = http_get(Url::GET_TOKEN, [
+            $cache = http_get(Url::TOKEN_INFO_GET, [
                 'corpid' => $this->corpid,
                 'corpsecret' => $this->secret
             ]);
@@ -97,10 +97,22 @@ class Agent
     }
 
     /**
+     * url追加access_token参数
+     */
+    public function appendAccessToken($url){
+        if(strpos($url, '?') === false){
+            $url .= '?access_token=' . $this->access_token;
+        }else{
+            $url .= '&access_token=' . $this->access_token;
+        }
+        return $url;
+    }
+
+    /**
      * 获取应用信息
      */
     public function getInfo(){
-        $result = http_get(append_access_token(Url::AGENT_GET, $this->access_token), ['agentid' => $this->agent_id]);
+        $result = http_get($this->appendAccessToken(Url::AGENT_INFO_GET), ['agentid' => $this->agent_id]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }

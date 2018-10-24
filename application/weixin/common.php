@@ -146,18 +146,3 @@ function get_file_cache($file_path){
     }
 
 }
-
-/**
- * 地址栏追加access_token参数
- * @param $url
- * @param $access_token
- * @return string
- */
-function append_access_token($url, $access_token){
-    if(strpos($url, '?') === false){
-        $url .= '?access_token=' . $access_token;
-    }else{
-        $url .= '&access_token=' . $access_token;
-    }
-    return $url;
-}

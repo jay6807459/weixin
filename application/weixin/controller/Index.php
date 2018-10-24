@@ -47,6 +47,7 @@ class Index
 
     /**
      * 应用相关
+     * @route('weixin/index/agent', 'get')
      */
     public function agent(){
         $op = input('get.op');
@@ -63,6 +64,7 @@ class Index
 
     /**
      * 消息发送
+     * @route('weixin/index/message', 'get')
      */
     public function message(){
         $op = input('get.op');
@@ -83,6 +85,7 @@ class Index
 
     /**
      * 用户相关
+     * @route('weixin/index/user', 'get')
      */
     public function user(){
         $op = input('get.op');
@@ -103,6 +106,7 @@ class Index
 
     /**
      * 部门相关
+     * @route('weixin/index/department', 'get')
      */
     public function department(){
         $op = input('get.op');

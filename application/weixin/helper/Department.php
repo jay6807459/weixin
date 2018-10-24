@@ -27,7 +27,7 @@ class Department extends Agent
      * @return mixed
      */
     public function getList(){
-        $result = http_get(append_access_token(Url::GET_DEPARTMENT_LIST, $this->access_token));
+        $result = http_get($this->appendAccessToken(Url::DEPARTMENT_LIST_GET));
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }
@@ -40,7 +40,7 @@ class Department extends Agent
      * @return mixed
      */
     public function getInfo($id){
-        $result = http_get(append_access_token(Url::GET_DEPARTMENT_LIST, $this->access_token), ['id' => $id]);
+        $result = http_get($this->appendAccessToken(Url::DEPARTMENT_LIST_GET), ['id' => $id]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }
@@ -52,7 +52,7 @@ class Department extends Agent
      * @param $data
      */
     public function create($data){
-        $result = http_post(append_access_token(Url::CREATE_DEPARTMENT_INFO, $this->access_token), $data);
+        $result = http_post($this->appendAccessToken(Url::DEPARTMENT_INFO_CREATE), $data);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }
@@ -64,7 +64,7 @@ class Department extends Agent
      * @param $data
      */
     public function update($data){
-        $result = http_post(append_access_token(Url::UPDATE_DEPARTMENT_INFO, $this->access_token), $data);
+        $result = http_post($this->appendAccessToken(Url::DEPARTMENT_INFO_UPDATE), $data);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }
@@ -76,7 +76,7 @@ class Department extends Agent
      * @param $id
      */
     public function delete($id){
-        $result = http_get(append_access_token(Url::DELETE_DEPARTMENT_INFO, $this->access_token), ['id' => $id]);
+        $result = http_get($this->appendAccessToken(Url::DEPARTMENT_INFO_DELETE), ['id' => $id]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }

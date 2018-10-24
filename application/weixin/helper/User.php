@@ -24,7 +24,7 @@ class User extends Agent
      * @param int $fetch_child      1/0：是否递归获取子部门下面的成员
      */
     public function getList($department_id, $fetch_child = 1){
-        $result = http_get(append_access_token(Url::GET_USER_LIST, $this->access_token), [
+        $result = http_get($this->appendAccessToken(Url::USER_LIST_GET), [
             'department_id' => $department_id,
             'fetch_child' => $fetch_child
         ]);
@@ -39,7 +39,7 @@ class User extends Agent
      * @param $userid
      */
     public function getInfo($userid){
-        $result = http_get(append_access_token(Url::GET_USER_INFO, $this->access_token), ['userid' => $userid]);
+        $result = http_get($this->appendAccessToken(Url::USER_INFO_GET), ['userid' => $userid]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
         }
