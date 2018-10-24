@@ -10,6 +10,7 @@ class Index
 {
     /**
      * 开启消息服务器验证-应用一
+     * 响应字符串(8415675619882302974)
      * @route('weixin/index/agent1', 'get')
      */
     public function agent1()
@@ -20,9 +21,10 @@ class Index
         $nonce = input('get.nonce');
         $echostr = input('get.echostr');
         //2.通过参数msg_signature对请求进行校验，确认调用者的合法性。
-        //3.解密echostr参数得到消息内容(即msg字段)
         $message = new Message(1000002);
-        $reply_echostr = $message->decode($msg_signature, $timestamp, $nonce, $echostr);
+        $message->validateSignature($msg_signature, $timestamp, $nonce, $echostr);
+        //3.解密echostr参数得到消息内容(即msg字段)
+        $reply_echostr = $message->decode($echostr);
         //4.在1秒内响应GET请求，响应内容为上一步得到的明文消息内容(不能加引号，不能带bom头，不能带换行符)
         echo $reply_echostr;
     }
@@ -32,7 +34,8 @@ class Index
      */
     public function response(){
         $message = new Message(1000002);
-        $message->receive();
+        $response_xml = $message->response();
+        echo $response_xml;
     }
 
     /**

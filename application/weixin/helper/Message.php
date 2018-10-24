@@ -11,7 +11,6 @@ namespace app\weixin\helper;
 
 use app\weixin\helper\algorithm\crypt;
 use think\Exception;
-use think\facade\Config;
 
 class Message extends Agent
 {
@@ -84,7 +83,7 @@ class Message extends Agent
     }
 
     /**
-     * 被动接收消息
+     * 被动接收消息并回复
     接收xml格式：
     <xml>
     <ToUserName><![CDATA[toUser]]></ToUserName>
@@ -99,76 +98,106 @@ class Message extends Agent
     <Nonce><![CDATA[nonce]]></Nonce>
     </xml>
      */
-    public function receive(){
-        $receive_crypt_xml = file_get_contents('php://input');
-        $crypt = new crypt($this->getEncodingAeskey());
-        $result = $crypt->decrypt($receive_crypt_xml, $this->corpid);
-        if ($result[0] != 0) {
-            return $result[0];
-        }
-        //解密xml明文
-        $receive_decrypt_xml = $result[1];
-        $receive_decrypt_arr = $this->xmlToArray($receive_decrypt_xml);
+    public function response(){
+        $receive_xml = file_get_contents('php://input');
+        $receive_arr = $this->xmlToArray($receive_xml);
+        $encrypt = $receive_arr['Encrypt'];
+        $decrypt_xml = $this->decode($encrypt);
+        $decrypt_arr = $this->xmlToArray($decrypt_xml);
+        switch ($decrypt_arr['MsgType']){
+            //接收用户消息并回复
+            case 'text':
+                if($decrypt_arr['Content'] == 666){
+                    $content = '最右666';
+                }else{
+                    $content = '没有关键字，无法自动回复';
+                }
+                $response_arr = [
+                    'ToUserName' => $decrypt_arr['FromUserName'],
+                    'FromUserName' => $decrypt_arr['ToUserName'],
+                    'CreateTime' => time(),
+                    'MsgType' => 'text',
+                    'Content' => $content
+                ];
+                break;
+            //进入应用事件、进入自定义菜单事件处理
+            case 'event':
+                if($decrypt_arr['Event'] == 'enter_agent'){
+                    $response_arr = [
+                        'ToUserName' => $decrypt_arr['FromUserName'],
+                        'FromUserName' => $decrypt_arr['ToUserName'],
+                        'CreateTime' => time(),
+                        'MsgType' => 'text',
+                        'Content' => '欢迎进入测试应用'
+                    ];
+                }elseif($decrypt_arr['Event'] == 'view'){
 
-        //构造被动响应数据
+                }
+            default:
+                break;
+        }
+        //消息体加密
+        $encrypt = $this->encode($response_arr);
+        //构造被动响应xml
+        $response_xml = $this->construct_response($encrypt);
+        return $response_xml;
 
     }
 
     /**
-     * 被动响应消息
+     * 构造被动响应消息
      */
-    public function response($data, $timestamp, $nonce){
-
-    }
-
-    /**
-     * 字符串加密
-     */
-    public function encode($data, $timestamp, $nonce){
-        $crypt = new crypt($this->getEncodingAeskey());
-        $visible_xml = $this->arrayToXml($data);
-        $result = $crypt->encrypt($visible_xml, $this->corpid);
-        if ($result[0] != 0) {
-            return $result[0];
-        }
-        //加密
-        $encrypt = $result[1];
-        //加密后的明文
+    public function construct_response($encrypt){
+        $timestamp = time();
+        $nonce = $this->getRandomStr();
         $signature = $this->createSignature($timestamp, $nonce, $encrypt);
-        $hidden_xml = $this->arrayToXml([
+        $crypt_xml = $this->arrayToXml([
             'Encrypt' => $encrypt,
             'MsgSignature' => $signature,
             'TimeStamp' => $timestamp,
             'Nonce' => $nonce
         ]);
-        return $hidden_xml;
+        return $crypt_xml;
     }
 
     /**
-     * 加密字符串解密
-     * @param $echostr
+     * 未加密的数组消息转换成加密字符串
      */
-    public function decode($msg_signature, $timestamp, $nonce, $echostr){
-        //验证签名
-        $this->validateSignature($msg_signature, $timestamp, $nonce, $echostr);
-        //解密
+    public function encode($response_arr){
         $crypt = new crypt($this->getEncodingAeskey());
-        $result = $crypt->decrypt($echostr, $this->corpid);
+        $decrypt_xml = $this->arrayToXml($response_arr);
+        $result = $crypt->encrypt($decrypt_xml, $this->corpid);
         if ($result[0] != 0) {
             return $result[0];
         }
-        $reply_echostr = $result[1];
-        return $reply_echostr;
+        //加密
+        $encrypt = $result[1];
+        return $encrypt;
+    }
+
+    /**
+     * Encrypt加密字符串解密为xml字符串或者普通字符串
+     * @param $echostr
+     */
+    public function decode($encrypt){
+        //解密
+        $crypt = new crypt($this->getEncodingAeskey());
+        $result = $crypt->decrypt($encrypt, $this->corpid);
+        if ($result[0] != 0) {
+            return $result[0];
+        }
+        $decrypt = $result[1];
+        return $decrypt;
     }
 
     /**
      * 数组转xml格式
-     * @param $data
+     * @param $arr
      */
-    public function arrayToXml($data){
+    public function arrayToXml($arr){
         $xml = '<xml>';
-        foreach($data as $k => $v){
-            $xml .= ($k == 'TimeStamp') ? "<{$k}><![CDATA[{$v}]]></{$k}>" : "<{$k}>{$v}</{$k}>";
+        foreach($arr as $k => $v){
+            $xml .= (is_numeric($v)) ? "<{$k}>{$v}</{$k}>" : "<{$k}><![CDATA[{$v}]]></{$k}>";
         }
         $xml .= '</xml>';
         return $xml;
@@ -176,9 +205,28 @@ class Message extends Agent
 
     /**
      * xml转数组格式
-     * @param $data
+     * @param $xml
      */
-    public function xmlToArray($data){
+    public function xmlToArray($xml){
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $arr = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $arr;
+    }
 
+    /**
+     * 生成随机字符串
+     *
+     * @return string
+     */
+    public function getRandomStr()
+    {
+        $str     = '';
+        $str_pol = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyl';
+        $max     = strlen($str_pol) - 1;
+        for ($i = 0; $i < 16; $i++) {
+            $str .= $str_pol[mt_rand(0, $max)];
+        }
+        return $str;
     }
 }
