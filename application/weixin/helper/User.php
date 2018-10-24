@@ -38,7 +38,7 @@ class User extends Agent
      * 获取用户信息
      * @param $userid
      */
-    public function getInfo($userid){
+    public function getInfo($userid = null){
         $result = http_get($this->appendAccessToken(Url::USER_INFO_GET), ['userid' => $userid]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);
