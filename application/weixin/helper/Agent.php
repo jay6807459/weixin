@@ -99,11 +99,16 @@ class Agent
     /**
      * url追加access_token参数
      */
-    public function appendAccessToken($url){
+    public function appendAccessToken($url, $param = array()){
         if(strpos($url, '?') === false){
             $url .= '?access_token=' . $this->access_token;
         }else{
             $url .= '&access_token=' . $this->access_token;
+        }
+        if(!empty($param)){
+            foreach($param as $k => $v){
+                $url .=  '&' . $k . '=' . $v;
+            }
         }
         return $url;
     }
