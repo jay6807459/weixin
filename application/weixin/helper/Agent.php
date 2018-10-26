@@ -109,6 +109,17 @@ class Agent
     }
 
     /**
+     * 获取应用列表
+     */
+    public function getList(){
+        $result = http_get($this->appendAccessToken(Url::AGENT_LIST_GET));
+        if($result['errcode'] != 0){
+            throw new Exception($result['errmsg']);
+        }
+        return $result;
+    }
+
+    /**
      * 获取应用信息
      */
     public function getInfo(){

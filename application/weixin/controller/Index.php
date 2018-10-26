@@ -6,6 +6,7 @@ use app\weixin\helper\Base;
 use app\weixin\helper\Department;
 use app\weixin\helper\Message;
 use app\weixin\helper\User;
+use app\weixin\helper\Menu;
 use think\Controller;
 
 class Index extends Controller
@@ -54,6 +55,11 @@ class Index extends Controller
     public function agent(){
         $op = input('get.op');
         switch ($op){
+            case 'list':
+                $agent = new Agent(1000002);
+                $agent_list = $agent->getList();
+                p($agent_list);
+                break;
             case 'info':
                 $agent = new Agent(1000002);
                 $agent_info = $agent->getInfo();
@@ -146,6 +152,49 @@ class Index extends Controller
             case 'delete':
                 $department = new Department(1000002);
                 $result = $department->delete(2);
+                p($result);
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 菜单相关
+     * @route('weixin/index/menu', 'get')
+     */
+    public function menu(){
+        $op = input('get.op');
+        switch ($op){
+            case 'create':
+                $menu = new Menu(1000002);
+                $menu->addButton([
+                    "name" => "扫码",
+                    "sub_button" => [
+                        [
+                            "type" => "scancode_waitmsg",
+                            "name" => "扫码带提示",
+                            "key" => "rselfmenu_0_0",
+                            "sub_button" => [ ]
+                        ],
+                        [
+                            "type" => "scancode_push",
+                            "name" => "扫码推事件",
+                            "key" => "rselfmenu_0_1",
+                            "sub_button" => [ ]
+                        ]
+                    ]
+                ]);
+                $menu_list = $menu->create();
+                p($menu_list);
+                break;
+            case 'list':
+                $menu = new Menu(1000002);
+                $menu_list = $menu->getList();
+                p($menu_list);
+                break;
+            case 'delete':
+                $user = new Menu(1000002);
+                $result = $user->deleteList();
                 p($result);
             default:
                 break;

@@ -23,7 +23,7 @@ class User extends Agent
      * @param $department_id        部门ID
      * @param int $fetch_child      1/0：是否递归获取子部门下面的成员
      */
-    public function getList($department_id, $fetch_child = 1){
+    public function getList($department_id = null, $fetch_child = 1){
         $result = http_get($this->appendAccessToken(Url::USER_LIST_GET), [
             'department_id' => $department_id,
             'fetch_child' => $fetch_child
