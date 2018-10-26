@@ -20,4 +20,6 @@ class Url
     const DEPARTMENT_INFO_DELETE = 'https://qyapi.weixin.qq.com/cgi-bin/department/delete';
     const USER_LIST_GET = 'https://qyapi.weixin.qq.com/cgi-bin/user/simplelist';
     const USER_INFO_GET = 'https://qyapi.weixin.qq.com/cgi-bin/user/get';
+    const USER_ID_GET = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo';
+    const USER_DETAIL_GET = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserdetail';
 }

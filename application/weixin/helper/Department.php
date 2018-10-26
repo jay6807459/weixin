@@ -39,7 +39,7 @@ class Department extends Agent
      * @param $id
      * @return mixed
      */
-    public function getInfo($id){
+    public function getInfo($id = null){
         $result = http_get($this->appendAccessToken(Url::DEPARTMENT_LIST_GET), ['id' => $id]);
         if($result['errcode'] != 0){
             throw new Exception($result['errmsg']);

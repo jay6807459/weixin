@@ -6,7 +6,9 @@ use app\weixin\helper\Base;
 use app\weixin\helper\Department;
 use app\weixin\helper\Message;
 use app\weixin\helper\User;
-class Index
+use think\Controller;
+
+class Index extends Controller
 {
     /**
      * 开启消息服务器验证-应用一
