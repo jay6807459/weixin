@@ -104,38 +104,51 @@ class Message extends Agent
         $encrypt = $receive_arr['Encrypt'];
         $decrypt_xml = $this->decode($encrypt);
         $decrypt_arr = $this->xmlToArray($decrypt_xml);
-        switch ($decrypt_arr['MsgType']){
-            //接收用户消息并回复
-            case 'text':
-                if($decrypt_arr['Content'] == 666){
-                    $content = '最右666';
-                }else{
-                    $content = '没有关键字，无法自动回复';
-                }
-                $response_arr = [
-                    'ToUserName' => $decrypt_arr['FromUserName'],
-                    'FromUserName' => $decrypt_arr['ToUserName'],
-                    'CreateTime' => time(),
-                    'MsgType' => 'text',
-                    'Content' => $content
-                ];
-                break;
-            //进入应用事件、进入自定义菜单事件处理
-            case 'event':
-                if($decrypt_arr['Event'] == 'enter_agent'){
-                    $response_arr = [
-                        'ToUserName' => $decrypt_arr['FromUserName'],
-                        'FromUserName' => $decrypt_arr['ToUserName'],
-                        'CreateTime' => time(),
-                        'MsgType' => 'text',
-                        'Content' => '欢迎进入测试应用'
-                    ];
-                }elseif($decrypt_arr['Event'] == 'view'){
-
-                }
-            default:
-                break;
-        }
+//        switch ($decrypt_arr['MsgType']){
+//            //接收用户消息并回复
+//            case 'text':
+//                if($decrypt_arr['Content'] == 666){
+//                    $content = '最右666';
+//                }else{
+//                    $content = '没有关键字，无法自动回复';
+//                }
+//                $response_arr = [
+//                    'ToUserName' => $decrypt_arr['FromUserName'],
+//                    'FromUserName' => $decrypt_arr['ToUserName'],
+//                    'CreateTime' => time(),
+//                    'MsgType' => 'text',
+//                    'Content' => $content
+//                ];
+//                break;
+//            //进入应用事件、进入自定义菜单事件处理
+//            case 'event':
+//                if($decrypt_arr['Event'] == 'enter_agent'){
+//                    $response_arr = [
+//                        'ToUserName' => $decrypt_arr['FromUserName'],
+//                        'FromUserName' => $decrypt_arr['ToUserName'],
+//                        'CreateTime' => time(),
+//                        'MsgType' => 'text',
+//                        'Content' => '欢迎进入测试应用'
+//                    ];
+//                }else{
+//                    $response_arr = [
+//                        'ToUserName' => $decrypt_arr['FromUserName'],
+//                        'FromUserName' => $decrypt_arr['ToUserName'],
+//                        'CreateTime' => time(),
+//                        'MsgType' => 'text',
+//                        'Content' => json_encode($decrypt_arr)
+//                    ];
+//                }
+//            default:
+//                break;
+//        }
+        $response_arr = [
+            'ToUserName' => $decrypt_arr['FromUserName'],
+            'FromUserName' => $decrypt_arr['ToUserName'],
+            'CreateTime' => time(),
+            'MsgType' => 'text',
+            'Content' => json_encode($decrypt_arr, JSON_UNESCAPED_UNICODE)
+        ];
         //消息体加密
         $encrypt = $this->encode($response_arr);
         //构造被动响应xml
